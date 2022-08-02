@@ -8,10 +8,12 @@ import Profile from './pages/Profile';
 import ProfileEdit from './pages/ProfileEdit';
 import NotFound from './pages/NotFound';
 
+import styles from './App.module.css';
+
 class App extends React.Component {
   render() {
     return (
-      <main>
+      <div className={ styles.app }>
         <Switch>
           <Route exact path="/" component={ Login } />
           <Route exact path="/search" component={ Search } />
@@ -21,7 +23,7 @@ class App extends React.Component {
           <Route exact path="/profile/edit" component={ ProfileEdit } />
           <Route exact path="*" component={ NotFound } />
         </Switch>
-      </main>
+      </div>
     );
   }
 }
