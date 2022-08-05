@@ -3,32 +3,63 @@ import PropTypes from 'prop-types';
 import Header from '../components/Header';
 import getMusics from '../services/musicsAPI';
 import MusicCard from '../components/MusicCard';
-import { addSong } from '../services/favoriteSongsAPI';
+import { addSong, getFavoriteSongs, removeSong } from '../services/favoriteSongsAPI';
 import Loading from '../components/Loading';
 
 export default class Album extends Component {
-  state = {
-    musics: [],
-    checkFavorite: false,
-    loading: false,
+  constructor(props) {
+    super(props);
+    this.state = {
+      descriptionAlbum: {},
+      musics: [],
+      tracksFavorites: [],
+      checkFavorite: false,
+      loading: false,
+    };
   }
 
-  componentDidMount() {
+  async componentDidMount() {
+    await this.getAllAlbuns();
+    await this.getAllFavorites();
+  }
+
+  getAllFavorites = async () => {
+    const favorites = await getFavoriteSongs();
+    this.setState({ tracksFavorites: [...favorites] });
+  }
+
+  getAllAlbuns = async () => {
     const { match: { params: { id } } } = this.props;
-    getMusics(id)
-      .then((response) => {
-        this.setState({ musics: [...response] });
-      });
+    const allAlbuns = await getMusics(id);
+    this.setState({ descriptionAlbum: allAlbuns[0], musics: allAlbuns.slice(1) });
   }
 
   handleChange = async (trackId) => {
     this.setState({ loading: true });
-    await addSong(trackId);
+    const { tracksFavorites } = this.state;
+    if (tracksFavorites.some((id) => id === trackId)) {
+      await removeSong(trackId);
+      this.setState((prevState) => ({
+        tracksFavorites: prevState.tracksFavorites.filter((id) => id !== trackId),
+      }));
+    } else {
+      this.setState({ loading: true });
+      await addSong(trackId);
+      this.setState((prevState) => ({
+        tracksFavorites: [...prevState.tracksFavorites, trackId],
+      }));
+    }
     this.setState({ loading: false });
   }
 
   render() {
-    const { musics, checkFavorite, loading } = this.state;
+    const {
+      musics,
+      checkFavorite,
+      loading,
+      descriptionAlbum,
+      tracksFavorites,
+    } = this.state;
     return (
       <div data-testid="page-album">
         <Header
@@ -36,17 +67,17 @@ export default class Album extends Component {
         />
         <div>
           {loading && <Loading />}
-          {musics.length > 0
-          && <h3 data-testid="album-name">{musics[0].collectionName}</h3>}
-          {musics.length > 0 && <p data-testid="artist-name">{musics[0].artistName}</p>}
-          {musics.length > 0 && musics.map((music, index) => (
-            index !== 0 && <MusicCard
+          <h3 data-testid="album-name">{descriptionAlbum.collectionName}</h3>
+          <p data-testid="artist-name">{descriptionAlbum.artistName}</p>
+          {musics.map((music) => (
+            <MusicCard
               key={ music.trackId }
               trackName={ music.trackName }
               previewUrl={ music.previewUrl }
               handleChange={ this.handleChange }
               checkFavorite={ checkFavorite }
               trackId={ music.trackId }
+              isFavorite={ tracksFavorites.some((id) => id === music.trackId) }
             />
           ))}
         </div>
