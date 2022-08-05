@@ -38,20 +38,21 @@ export default class Album extends Component {
 
   handleChange = async ({ target: { checked } }, music) => {
     this.setState({ loading: true });
-    if (!checked) {
-      await removeSong(music);
-      this.setState((prevState) => ({
-        tracksFavorites: prevState.tracksFavorites
-          .filter(({ trackId }) => trackId !== music.trackId),
-      }));
-    } else {
+    if (checked) {
       this.setState({ loading: true });
       await addSong(music);
       this.setState((prevState) => ({
         tracksFavorites: [...prevState.tracksFavorites, music],
+        loading: false,
+      }));
+    } else {
+      await removeSong(music);
+      this.setState((prevState) => ({
+        tracksFavorites: prevState.tracksFavorites
+          .filter(({ trackId }) => trackId !== music.trackId),
+        loading: false,
       }));
     }
-    this.setState({ loading: false });
   }
 
   render() {
