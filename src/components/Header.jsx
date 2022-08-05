@@ -4,10 +4,11 @@ import { Link } from 'react-router-dom';
 
 export default class Header extends Component {
   render() {
-    const { title } = this.props;
+    const { title, titleName } = this.props;
     return (
       <header data-testid="header-component">
         <h1>{title}</h1>
+        <h3>{titleName}</h3>
         <nav>
           <ul>
             <li>
@@ -28,4 +29,5 @@ export default class Header extends Component {
 
 Header.propTypes = {
   title: PropTypes.string.isRequired,
+  titleName: PropTypes.string.isRequired,
 };
