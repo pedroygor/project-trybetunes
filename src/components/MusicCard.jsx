@@ -44,5 +44,7 @@ MusicCard.propTypes = {
   trackId: PropTypes.number.isRequired,
   handleChange: PropTypes.func.isRequired,
   isFavorite: PropTypes.bool.isRequired,
-  music: PropTypes.object.isRequired,
+  music: PropTypes.shape({
+    trackId: PropTypes.number.isRequired,
+  }).isRequired,
 };
