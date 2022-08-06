@@ -29,5 +29,9 @@ export default class Header extends Component {
 
 Header.propTypes = {
   title: PropTypes.string.isRequired,
-  titleName: PropTypes.string.isRequired,
+  titleName: PropTypes.string,
+};
+
+Header.defaultProps = {
+  titleName: '',
 };
